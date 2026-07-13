@@ -198,6 +198,50 @@ Payload:
 Token sẽ được gửi trong header: Authorization: Bearer <token>
 ```
 
+## Payment Integration (Phase 2)
+
+### VNPay Setup
+1. Đăng ký tài khoản VNPay Sandbox: https://sandbox.vnpayment.vn
+2. Cấu hình trong `application.properties`:
+```properties
+vnpay.tmn-code=YOUR_TMN_CODE
+vnpay.hash-secret=YOUR_HASH_SECRET
+vnpay.api-url=https://sandbox.vnpayment.vn/paygate/api/transaction
+vnpay.return-url=http://localhost:3000/payment-result
+vnpay.notify-url=http://localhost:8080/api/payments/vnpay-webhook
+```
+
+### SePay Setup
+1. Đăng ký tài khoản SePay: https://se-pay.com
+2. Cấu hình API Key:
+```properties
+sepay.api-key=YOUR_API_KEY
+sepay.webhook-url=http://localhost:8080/api/payments/sepay-webhook
+```
+
+### Payment API Endpoints
+```bash
+# Initiate payment
+POST /api/payments/init?courseId=1
+
+# Get VNPay payment URL
+GET /api/payments/vnpay-url/{transactionId}
+
+# Check transaction status
+GET /api/payments/{transactionId}
+
+# Get my transactions
+GET /api/payments/student/transactions
+
+# VNPay webhook (called by VNPay automatically)
+POST /api/payments/vnpay-webhook
+
+# SePay webhook (called by SePay automatically)
+POST /api/payments/sepay-webhook
+```
+
+**Xem chi tiết:** `PAYMENT_INTEGRATION_GUIDE.md` & `PHASE2_IMPLEMENTATION_SUMMARY.md`
+
 ## Testing
 
 ### Unit Tests
@@ -210,10 +254,22 @@ mvn test
 mvn test -P integration-test
 ```
 
+### Payment Tests
+```bash
+# Test VNPay service
+mvn test -Dtest=VNPayServiceTest
+
+# Test SePay service  
+mvn test -Dtest=SePayServiceTest
+
+# Test Payment service
+mvn test -Dtest=PaymentServiceTest
+```
+
 ### Manual Testing with Postman
 ```bash
-# Import Postman collection từ:
-# docs/postman/EduNexus.postman_collection.json
+# Import Phase 2 Payment Collection
+EduNexus_Payment_API_Phase2.postman_collection.json
 ```
 
 ## Deployment

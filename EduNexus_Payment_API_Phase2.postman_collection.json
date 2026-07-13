@@ -1,0 +1,249 @@
+{
+  "info": {
+    "name": "EduNexus Payment API - Phase 2",
+    "description": "Collection for testing EduNexus payment integration (VNPay + SePay)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"Password@123\",\n  \"email\": \"student1@test.com\",\n  \"fullName\": \"John Student\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"student1\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Payment Initiation",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/payments/init?courseId=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "init"],
+              "query": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get VNPay Payment URL",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/payments/vnpay-url/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "vnpay-url", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Payment Status",
+      "item": [
+        {
+          "name": "Get Transaction Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/payments/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get My Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/payments/student/transactions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "student", "transactions"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. VNPay Webhook Simulator",
+      "item": [
+        {
+          "name": "VNPay Success Webhook (Sample)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/payments/vnpay-webhook?vnp_TxnRef=TXN-123&vnp_ResponseCode=00&vnp_TransactionNo=VNP12345&vnp_SecureHash=HASH_HERE",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "vnpay-webhook"],
+              "query": [
+                {
+                  "key": "vnp_TxnRef",
+                  "value": "TXN-123"
+                },
+                {
+                  "key": "vnp_ResponseCode",
+                  "value": "00"
+                },
+                {
+                  "key": "vnp_TransactionNo",
+                  "value": "VNP12345"
+                },
+                {
+                  "key": "vnp_SecureHash",
+                  "value": "HASH_HERE",
+                  "description": "Generate using VNPayService.generateSecureHash()"
+                }
+              ]
+            },
+            "description": "NOTE: You need to generate valid HMAC-SHA512 signature using the VNPayService class. This is a sample structure only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. SePay Webhook Simulator",
+      "item": [
+        {
+          "name": "SePay Transfer Success Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Signature",
+                "value": "SIGNATURE_HERE"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"TXN-123\",\n  \"amount\": 9999,\n  \"status\": \"00\",\n  \"bank\": \"VCB\",\n  \"transactionNo\": \"SEPAY-999\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/payments/sepay-webhook",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "sepay-webhook"]
+            },
+            "description": "NOTE: Generate X-Signature using SePayService.generateSignature() method with HMAC-SHA256 + Base64 encoding"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Health Check",
+      "item": [
+        {
+          "name": "Payment Service Health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/payments/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "payments", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "access_token",
+      "value": "",
+      "description": "JWT access token from login endpoint"
+    }
+  ]
+}
